@@ -76,7 +76,8 @@ def init():
 
     # ask for the package data
     package_data['packagename'] = raw_input('Package name ({}): '.format(package_data['packagename'])) or package_data['packagename']
-    package_data['packagename_caps'] = package_data['packagename'].title()
+    package_data['packagename_file'] = package_data['packagename'].replace('-','_')
+    package_data['packagename_caps'] = package_data['packagename_file'].title()
     package_data['description'] = raw_input('Package description ({}): '.format(package_data['description'])) or package_data['description']
     package_data['url'] = raw_input('Package url ({}): '.format(package_data['url'])) or package_data['url']
     package_data['author'] = raw_input('Author ({}): '.format(package_data['author'])) or package_data['author']
@@ -85,9 +86,10 @@ def init():
 
 
 
+
     # create folders
-    if not os.path.exists(package_data['packagename']):
-        os.makedirs(package_data['packagename'])
+    if not os.path.exists(package_data['packagename_file']):
+        os.makedirs(package_data['packagename_file'])
     if not os.path.exists('tests'):
         os.makedirs('tests')
     if not os.path.exists('examples'):
@@ -115,20 +117,20 @@ def init():
         file.write(gitignore_file)
         file.close()
 
-    filename = os.path.join(package_data['packagename'],'__init__.py')
+    filename = os.path.join(package_data['packagename_file'],'__init__.py')
     if not os.path.isfile(filename):
         file = open(filename, 'w+')
         file.write('from __version__ import version as __version__\n')
-        file.write('from {} import *\n'.format(package_data['packagename']))
+        file.write('from {} import *\n'.format(package_data['packagename_file']))
         file.close()
 
-    filename = os.path.join(package_data['packagename'],'__version__.py')
+    filename = os.path.join(package_data['packagename_file'],'__version__.py')
     if not os.path.isfile(filename):
         file = open(filename, 'w+')
         file.write('version = \'0.0.0\'')
         file.close()
 
-    filename = os.path.join(package_data['packagename'],'{}.py'.format(package_data['packagename']))
+    filename = os.path.join(package_data['packagename_file'],'{}.py'.format(package_data['packagename_file']))
     if not os.path.isfile(filename):
         file = open(filename, 'w+')
         file.write(file_header[package_data['license']].format(**package_data))
@@ -140,12 +142,7 @@ def init():
         file.write(file_header[package_data['license']].format(**package_data))
         file.close()
 
-    filename = os.path.join('tests','__init__.py')
-    if not os.path.isfile(filename):
-        file = open(filename, 'w+')
-        file.close()
-
-    filename = os.path.join('tests','test_{}.py'.format(package_data['packagename']))
+    filename = os.path.join('tests','test_{}.py'.format(package_data['packagename_file']))
     if not os.path.isfile(filename):
         file = open(filename, 'w+')
         file.write(file_header[package_data['license']].format(**package_data))
@@ -156,7 +153,9 @@ def init():
     if not os.path.isfile(filename):
         file = open(filename, 'w+')
         file.write(file_header[package_data['license']].format(**package_data))
-        file.write('from test_{packagename} import *'.format(**package_data))
+        file.write('import unittest\n\n')
+        file.write('from test_{packagename_file} import *\n\n'.format(**package_data))
+        file.write('if __name__ == \'__main__\':\n    unittest.main()')
         file.close()
 
 

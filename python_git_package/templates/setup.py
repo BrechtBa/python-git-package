@@ -4,14 +4,14 @@ import os
 
 # retrieve the version
 try:
-    versionfile = os.path.join('{packagename}','version.py')
+    versionfile = os.path.join('{packagename_file}','__version__.py')
     f = open( versionfile, 'r')
     content = f.readline()
     splitcontent = content.split('\'')
     version = splitcontent[1]
     f.close()
 except:
-    raise Exception('Could not determine the version from {packagename}/version.py')
+    raise Exception('Could not determine the version from {packagename_file}/__version__.py')
 
 
 # run the setup command
@@ -24,7 +24,7 @@ setup(
     url='{url}',
     author='{author}',
     author_email='{author_email}',
-    packages=['{packagename}'],
+    packages=['{packagename_file}'],
     install_requires=[],
     classifiers=['Programming Language :: Python :: 2.7'],
 )

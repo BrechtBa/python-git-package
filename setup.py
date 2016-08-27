@@ -34,6 +34,7 @@ setup(
 	classifiers=classifiers,
     entry_points={'console_scripts': [
         'python-git-package=python_git_package:execute_from_command_line',
+        'pgp=python_git_package:execute_from_command_line',
     ]},
 )
 
