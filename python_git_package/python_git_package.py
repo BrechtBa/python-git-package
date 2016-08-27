@@ -168,14 +168,16 @@ def release():
     Creates a new release
     """
 
-    # get the package data
-    package_data = get_data_from_setup()
-    if 'name' in package_data:
-        name = package_data['name']
-    else:
-        name = '?'
+    # search for a version file
+    versionfilename = ''
+    for d in os.walk('.'):
+        filename = os.path.join(d[0],'__version__.py')
+        if os.path.isfile(filename):
+            versionfilename = filename
+            break
 
-    versionfilename = os.path.join(name,'__version__.py')
+    if filename == '':
+        print('Could not find __version__.py')
 
     branch = subprocess.check_output(['git', 'rev-parse', '--abbrev-ref', 'HEAD' ])[:-1]
     
@@ -222,7 +224,6 @@ def release():
         
 
     print('')
-    print('Creating a new release for {}'.format(name) )
     print('GIT branch: {}'.format(branch) )
     print('Version: {}'.format(version) )
 
