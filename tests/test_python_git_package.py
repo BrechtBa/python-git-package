@@ -17,3 +17,14 @@
 #    along with python-git-package.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
+import unittest
+
+import python_git_package
+
+class TestPython_Git_Package(unittest.TestCase):
+
+    def test_version(self):
+        self.assertGreater( len(python_git_package.__version__), 0 )
+
+if __name__ == '__main__':
+    unittest.main()

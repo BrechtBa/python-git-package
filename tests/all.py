@@ -17,3 +17,9 @@
 #    along with python-git-package.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
+import unittest
+
+from test_python_git_package import *
+
+if __name__ == '__main__':
+    unittest.main()
