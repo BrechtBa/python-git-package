@@ -11,10 +11,10 @@ Prequisites
 
 Setup
 ^^^^^
-* download the latest `release <https://github.com/xxx>`_
+* download the latest `release <https://github.com/BrechtBa/python-git-package/releases>`_
 * unzip and cd to the folder
 * run ``python setup.py install``
 
 Examples
 ========
-To get started, check the `examples <https://github.com/xxx/tree/master/examples/>`_ folder
+To get started, check the `examples <https://github.com/BrechtBa/python-git-package/tree/master/examples/>`_ folder
