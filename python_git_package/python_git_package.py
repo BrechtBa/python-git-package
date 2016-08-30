@@ -45,10 +45,16 @@ def init():
     # check for existing files
     createsetup = True
     if os.path.isfile('setup.py'):
-        response = raw_input_validated('A setup file was found, keep this file? (y)','y',['y','n','yes','no'],'Error: {} is not a valid response','Valid responses are:')
+        response = raw_input_validated('A setup.py file was found, keep this file? (y)','y',['y','n','yes','no'],'Error: {} is not a valid response','Valid responses are:')
         if response in ['y','yes']:
             createsetup = False
 
+    createmanifest = True        
+    if os.path.isfile('manifest.in'):
+        response = raw_input_validated('A manifest.in file was found, keep this file? (y)','y',['y','n','yes','no'],'Error: {} is not a valid response','Valid responses are:')
+        if response in ['y','yes']:
+            createmanifest = False
+            
     createlicense = True
     if os.path.isfile('LICENSE') or os.path.isfile('license') or os.path.isfile('LICENSE.txt') or os.path.isfile('license.txt') or os.path.isfile('LICENSE.md') or os.path.isfile('license.md'):
         response = raw_input_validated('A license file was found, keep this file? (y)','y',['y','n','yes','no'],'Error: {} is not a valid response','Valid responses are:')
@@ -100,6 +106,11 @@ def init():
     if createsetup:
         file = open('setup.py', 'w+')
         file.write(setup_file.format(**package_data))
+        file.close()
+        
+    if createmanifest:
+        file = open('manifest.in', 'w+')
+        file.write('include README.md\ninclude LICENSE\ninclude examples/example.py')
         file.close()
 
     if createreadme:

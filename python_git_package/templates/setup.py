@@ -1,5 +1,5 @@
 #!/usr/bin/env/ python
-from setuptools import setup
+from setuptools import setup, find_packages
 import os
 
 # retrieve the version
@@ -24,7 +24,7 @@ setup(
     url='{url}',
     author='{author}',
     author_email='{author_email}',
-    packages=['{packagename_file}'],
+    packages=find_packages(),
     install_requires=[],
     classifiers=['Programming Language :: Python :: 2.7'],
 )
