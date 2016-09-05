@@ -318,6 +318,8 @@ def release():
 
 
     # write the new version number to version.py
+    print('version = \'{}\''.format(version))
+    print(versionfilename)
     with open( versionfilename, 'w') as f:
         f.write( 'version = \'{}\''.format(version) )
 
