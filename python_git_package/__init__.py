@@ -1,5 +1,5 @@
 
-from __version__ import version as __version__
+from .__version__ import version as __version__
 
-from python_git_package import *
+from .python_git_package import *
 

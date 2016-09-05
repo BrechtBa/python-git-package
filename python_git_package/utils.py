@@ -19,6 +19,15 @@
 
 import os
 
+# python 2 and python 3 compatibility
+try:
+    # python 3
+    raw_input = raw_input
+except:
+    # python 3
+    raw_input = input
+    
+    
 def load_template(filename):
     with open(os.path.join( os.path.dirname(os.path.abspath(__file__)),'templates',filename), 'r') as file:
         return file.read()

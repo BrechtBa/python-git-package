@@ -31,4 +31,5 @@ setup(
         'python-git-package=python_git_package:execute_from_command_line',
         'pgp=python_git_package:execute_from_command_line',
     ]},
+    data_files=[ (root,[os.path.join(root,f) for f in files]) for root,subfolders,files in os.walk(os.path.join('python_git_package','templates')) ]
 )

@@ -24,7 +24,8 @@ import re
 import subprocess
 import shutil
 
-import utils
+from . import utils
+    
 
 setup_file = utils.load_template('setup.py')
 readme_file = utils.load_template('README.rst')
@@ -113,14 +114,14 @@ def init():
 
     # ask for the package data
     print('')
-    package_data['packagename'] = raw_input('Package name ({}): '.format(package_data['packagename'])) or package_data['packagename']
+    package_data['packagename'] = utils.raw_input('Package name ({}): '.format(package_data['packagename'])) or package_data['packagename']
     package_data['packagename_file'] = package_data['packagename'].replace('-','_')
     package_data['packagename_caps'] = package_data['packagename_file'].title()
     package_data['packagename_underline'] = package_data['packagename'] + '\n' + '='*len(package_data['packagename'])
-    package_data['description'] = raw_input('Package description ({}): '.format(package_data['description'])) or package_data['description']
-    package_data['url'] = raw_input('Package url ({}): '.format(package_data['url'])) or package_data['url']
-    package_data['author'] = raw_input('Author ({}): '.format(package_data['author'])) or package_data['author']
-    package_data['author_email'] = raw_input('Author email ({}): '.format(package_data['author_email'])) or package_data['author_email']
+    package_data['description'] = utils.raw_input('Package description ({}): '.format(package_data['description'])) or package_data['description']
+    package_data['url'] = utils.raw_input('Package url ({}): '.format(package_data['url'])) or package_data['url']
+    package_data['author'] = utils.raw_input('Author ({}): '.format(package_data['author'])) or package_data['author']
+    package_data['author_email'] = utils.raw_input('Author email ({}): '.format(package_data['author_email'])) or package_data['author_email']
     package_data['license'] = utils.raw_input_validated('License ({}): '.format(package_data['license']),package_data['license'],license_texts.keys(),'Error: {} is not a valid license name','Valid licence names are:')
 
 
@@ -192,7 +193,7 @@ def init():
     filename = os.path.join(package_data['packagename_file'],'__init__.py')
     if not os.path.isfile(filename):
         file = open(filename, 'w+')
-        file.write('from __version__ import version as __version__\n')
+        file.write('from .__version__ import version as __version__\n')
         file.write('from {} import *\n'.format(package_data['packagename_file']))
         file.close()
 
@@ -290,7 +291,7 @@ def release():
 
 
     # ask for a new version number
-    version = raw_input('new version number: ') 
+    version = utils.raw_input('new version number: ') 
 
     # check if the new version is higher than the old version
     splitversion = version.split('.')
@@ -300,7 +301,7 @@ def release():
 
     # ask if you've updated the changelog
     changelog = ''
-    response = raw_input_validated('Did you update the changelog? ','',['y','n','yes','no'],'Error: {} is not a valid response','Valid responses are:')
+    response = utils.raw_input_validated('Did you update the changelog? ','',['y','n','yes','no'],'Error: {} is not a valid response','Valid responses are:')
     if response in ['n','no']:
         print('Update the changelog before issuing a release')
         return
@@ -310,7 +311,7 @@ def release():
     print('GIT branch: {}'.format(branch) )
     print('Version: {}'.format(version) )
 
-    response = raw_input_validated('Is this ok? ','',['y','n','yes','no'],'Error: {} is not a valid response','Valid responses are:')
+    response = utils.raw_input_validated('Is this ok? ','',['y','n','yes','no'],'Error: {} is not a valid response','Valid responses are:')
     if response in ['n','no']:
         print('Exit')
         return
