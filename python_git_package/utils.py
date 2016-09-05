@@ -36,14 +36,6 @@ def load_templates_folder(path):
     return result
 
 
-setup_file = load_template('setup.py')
-readme_file = load_template('README.rst')
-gitignore_file = load_template('gitignore')
-test_file = load_template('tests.py')
-file_header = load_templates_folder('file_header')
-license_text = load_templates_folder('license_text')
-
-
 def raw_input_validated(question,default,valid,errormessage,validlistmessage=''):
 
     ask = True

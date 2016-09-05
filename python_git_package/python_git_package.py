@@ -22,11 +22,35 @@ import os
 import datetime
 import re
 import subprocess
+import shutil
 
-from utils import setup_file,readme_file,gitignore_file,test_file,file_header,license_text,raw_input_validated
+import utils #from utils import setup_file,readme_file,gitignore_file,test_file,file_header,license_text,raw_input_validated
+
+
+setup_file = utils.load_template('setup.py')
+readme_file = utils.load_template('README.rst')
+gitignore_file = utils.load_template('gitignore')
+test_file = utils.load_template('tests.py')
+file_header = utils.load_templates_folder('file_header')
+license_text = utils.load_templates_folder('license_text')
+
+docs_conf_file = utils.load_template('sphinx/conf.py')
+docs_index_file = utils.load_template('sphinx/index.rst')
+docs_pakagename_file = utils.load_template('sphinx/pakagename.rst')
+
 
 def init():
-
+    """
+    Scaffolding
+    
+    Examples
+    --------
+    .. code-block:: bash
+    
+        pgp init
+        
+    """
+    
     # default package data
     package_data = {}
     package_data['packagename'] = os.path.split(os.getcwd())[-1]
@@ -45,35 +69,41 @@ def init():
     # check for existing files
     createsetup = True
     if os.path.isfile('setup.py'):
-        response = raw_input_validated('A setup.py file was found, keep this file? (y)','y',['y','n','yes','no'],'Error: {} is not a valid response','Valid responses are:')
+        response = utils.raw_input_validated('A setup.py file was found, keep this file? (y)','y',['y','n','yes','no'],'Error: {} is not a valid response','Valid responses are:')
         if response in ['y','yes']:
             createsetup = False
 
     createmanifest = True        
     if os.path.isfile('manifest.in'):
-        response = raw_input_validated('A manifest.in file was found, keep this file? (y)','y',['y','n','yes','no'],'Error: {} is not a valid response','Valid responses are:')
+        response = utils.raw_input_validated('A manifest.in file was found, keep this file? (y)','y',['y','n','yes','no'],'Error: {} is not a valid response','Valid responses are:')
         if response in ['y','yes']:
             createmanifest = False
             
     createlicense = True
     if os.path.isfile('LICENSE') or os.path.isfile('license') or os.path.isfile('LICENSE.txt') or os.path.isfile('license.txt') or os.path.isfile('LICENSE.md') or os.path.isfile('license.md'):
-        response = raw_input_validated('A license file was found, keep this file? (y)','y',['y','n','yes','no'],'Error: {} is not a valid response','Valid responses are:')
+        response = utils.raw_input_validated('A license file was found, keep this file? (y)','y',['y','n','yes','no'],'Error: {} is not a valid response','Valid responses are:')
         if response in ['y','yes']:
             createlicense = False
 
     createreadme = True
     if os.path.isfile('README') or os.path.isfile('readme') or os.path.isfile('README.rst') or os.path.isfile('readme.rst') or os.path.isfile('README.md') or os.path.isfile('readme.md'):
-        response = raw_input_validated('A readme file was found, keep this file? (y)','y',['y','n','yes','no'],'Error: {} is not a valid response','Valid responses are:')
+        response = utils.raw_input_validated('A readme file was found, keep this file? (y)','y',['y','n','yes','no'],'Error: {} is not a valid response','Valid responses are:')
         if response in ['y','yes']:
             createreadme = False
 
     creategitignore = True
     if os.path.isfile('.gitignore'):
-        response = raw_input_validated('A .gitignore file was found, keep this file? (y)','y',['y','n','yes','no'],'Error: {} is not a valid response','Valid responses are:')
+        response = utils.raw_input_validated('A .gitignore file was found, keep this file? (y)','y',['y','n','yes','no'],'Error: {} is not a valid response','Valid responses are:')
         if response in ['y','yes']:
             creategitignore = False
 
+    createdocs = True
+    if os.path.isdir('doc'):
+        response = utils.raw_input_validated('A doc directory was found, keep this directory? (y)','y',['y','n','yes','no'],'Error: {} is not a valid response','Valid responses are:')
+        if response in ['y','yes']:
+            createdocs = False
 
+            
     # check existing files for package data
     if not createsetup:
         package_data.update(get_data_from_setup())
@@ -81,14 +111,16 @@ def init():
 
 
     # ask for the package data
+    print('')
     package_data['packagename'] = raw_input('Package name ({}): '.format(package_data['packagename'])) or package_data['packagename']
     package_data['packagename_file'] = package_data['packagename'].replace('-','_')
     package_data['packagename_caps'] = package_data['packagename_file'].title()
+    package_data['packagename_underline'] = package_data['packagename'] + '\n' + '='*len(package_data['packagename'])
     package_data['description'] = raw_input('Package description ({}): '.format(package_data['description'])) or package_data['description']
     package_data['url'] = raw_input('Package url ({}): '.format(package_data['url'])) or package_data['url']
     package_data['author'] = raw_input('Author ({}): '.format(package_data['author'])) or package_data['author']
     package_data['author_email'] = raw_input('Author email ({}): '.format(package_data['author_email'])) or package_data['author_email']
-    package_data['license'] = raw_input_validated('License ({}): '.format(package_data['license']),package_data['license'],license_text.keys(),'Error: {} is not a valid license name','Valid licence names are:')
+    package_data['license'] = utils.raw_input_validated('License ({}): '.format(package_data['license']),package_data['license'],license_text.keys(),'Error: {} is not a valid license name','Valid licence names are:')
 
 
 
@@ -128,6 +160,34 @@ def init():
         file.write(gitignore_file)
         file.close()
 
+    if createdocs:
+        if not os.path.isdir('doc'):
+            os.mkdir('doc')
+        if not os.path.isdir('doc/source'):    
+            os.mkdir('doc/source')
+        if not os.path.isdir('doc/build'):
+            os.mkdir('doc/build')
+        if not os.path.isdir('doc/source/_static'):
+            os.mkdir('doc/source/_static')
+        if not os.path.isdir('doc/source/_templates'):
+            os.mkdir('doc/source/_templates')
+        
+        file = open('doc/source/conf.py', 'w+')
+        file.write(docs_conf_file.format(**package_data))
+        file.close()
+        
+        file = open('doc/source/index.rst', 'w+')
+        file.write(docs_index_file.format(**package_data))
+        file.close()
+        
+        file = open('doc/source/{}.rst'.format(package_data['packagename_file']), 'w+')
+        file.write(docs_pakagename_file.format(**package_data))
+        file.close()
+        
+        file = open('doc/.gitignore', 'w+')
+        file.write('build')
+        file.close()
+        
     filename = os.path.join(package_data['packagename_file'],'__init__.py')
     if not os.path.isfile(filename):
         file = open(filename, 'w+')
@@ -177,6 +237,15 @@ def init():
 def release():
     """
     Creates a new release
+    
+    Examples
+    --------
+    .. code-block:: bash
+    
+        pgp release
+        
+        
+        
     """
 
     # search for a version file
@@ -274,7 +343,22 @@ def release():
     output = subprocess.check_output(['git', 'checkout', branch])[:-1]
 
 
-
+def doc():
+    """
+    Builds the documentation to html using Sphinx
+    
+    Examples
+    --------
+    .. code-block:: bash
+    
+        pgp doc
+     
+    """
+    
+    output = subprocess.check_output(['sphinx-build', '-b', 'html', 'doc/source', 'doc/build/html'])[:-1]
+    print(output)
+    
+    
 def get_data_from_setup():
     package_data = {}
 
@@ -296,7 +380,15 @@ def get_data_from_setup():
             matchObj = re.match('.*author_email=\'(.*)\'',line)
             if matchObj:
                 package_data['author_email'] = matchObj.group(1)
-
+                
+            matchObj = re.match('.*url=\'(.*)\'',line)
+            if matchObj:
+                package_data['url'] = matchObj.group(1)
+                
+            matchObj = re.match('.*license=\'(.*)\'',line)
+            if matchObj:
+                package_data['license'] = matchObj.group(1)
+                
     return package_data
 
 
@@ -310,6 +402,9 @@ def execute_from_command_line():
         init()
     elif command == 'release':
         release()
+        
+    elif command == 'doc':
+        doc()
     else:
         print('not a valid command')
         print('usage:')
