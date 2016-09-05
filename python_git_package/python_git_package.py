@@ -67,7 +67,6 @@ def init():
     package_data['year'] = now.year
 
 
-
     # check for existing files
     createsetup = True
     if os.path.isfile('setup.py'):
