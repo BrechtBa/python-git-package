@@ -254,10 +254,11 @@ def release():
     # search for a version file
     versionfilename = ''
     for d in os.walk('.'):
-        filename = os.path.join(d[0],'__version__.py')
-        if os.path.isfile(filename):
-            versionfilename = filename
-            break
+        if not 'build' in d[0]:
+            filename = os.path.join(d[0],'__version__.py')
+            if os.path.isfile(filename):
+                versionfilename = filename
+                break
 
     if filename == '':
         print('Could not find __version__.py')
