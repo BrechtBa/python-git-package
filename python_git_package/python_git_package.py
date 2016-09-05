@@ -30,6 +30,8 @@ setup_file = utils.load_template('setup.py')
 readme_file = utils.load_template('README.rst')
 gitignore_file = utils.load_template('gitignore')
 test_file = utils.load_template('tests.py')
+function_scaffold = utils.load_template('function_scaffold.py')
+
 license_headers = utils.load_templates_folder('license/header')
 license_texts = utils.load_templates_folder('license/text')
 
@@ -57,7 +59,7 @@ def init():
     package_data['url'] = ''
     package_data['author'] = 'me'
     package_data['author_email'] = ''
-    package_data['license'] = 'GPLv3'
+    package_data['license'] = 'MIT'
 
     # current year
     now = datetime.datetime.now()
@@ -204,6 +206,8 @@ def init():
     if not os.path.isfile(filename):
         file = open(filename, 'w+')
         file.write(license_headers[package_data['license']].format(**package_data))
+        file.write('\n')
+        file.write(function_scaffold)
         file.close()
 
     filename = os.path.join('examples','example.py')
