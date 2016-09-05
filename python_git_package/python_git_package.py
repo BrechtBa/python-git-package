@@ -24,15 +24,14 @@ import re
 import subprocess
 import shutil
 
-import utils #from utils import setup_file,readme_file,gitignore_file,test_file,file_header,license_text,raw_input_validated
-
+import utils
 
 setup_file = utils.load_template('setup.py')
 readme_file = utils.load_template('README.rst')
 gitignore_file = utils.load_template('gitignore')
 test_file = utils.load_template('tests.py')
-file_header = utils.load_templates_folder('file_header')
-license_text = utils.load_templates_folder('license_text')
+license_headers = utils.load_templates_folder('license/header')
+license_texts = utils.load_templates_folder('license/text')
 
 docs_conf_file = utils.load_template('sphinx/conf.py')
 docs_index_file = utils.load_template('sphinx/index.rst')
@@ -120,7 +119,7 @@ def init():
     package_data['url'] = raw_input('Package url ({}): '.format(package_data['url'])) or package_data['url']
     package_data['author'] = raw_input('Author ({}): '.format(package_data['author'])) or package_data['author']
     package_data['author_email'] = raw_input('Author email ({}): '.format(package_data['author_email'])) or package_data['author_email']
-    package_data['license'] = utils.raw_input_validated('License ({}): '.format(package_data['license']),package_data['license'],license_text.keys(),'Error: {} is not a valid license name','Valid licence names are:')
+    package_data['license'] = utils.raw_input_validated('License ({}): '.format(package_data['license']),package_data['license'],license_texts.keys(),'Error: {} is not a valid license name','Valid licence names are:')
 
 
 
@@ -152,7 +151,7 @@ def init():
 
     if createlicense:
         file = open('LICENSE', 'w+')
-        file.write(license_text[package_data['license']])
+        file.write(license_texts[package_data['license']])
         file.close()
 
     if creategitignore:
@@ -204,26 +203,26 @@ def init():
     filename = os.path.join(package_data['packagename_file'],'{}.py'.format(package_data['packagename_file']))
     if not os.path.isfile(filename):
         file = open(filename, 'w+')
-        file.write(file_header[package_data['license']].format(**package_data))
+        file.write(license_headers[package_data['license']].format(**package_data))
         file.close()
 
     filename = os.path.join('examples','example.py')
     if not os.path.isfile(filename):
         file = open(filename, 'w+')
-        file.write(file_header[package_data['license']].format(**package_data))
+        file.write(license_headers[package_data['license']].format(**package_data))
         file.close()
 
     filename = os.path.join('tests','test_{}.py'.format(package_data['packagename_file']))
     if not os.path.isfile(filename):
         file = open(filename, 'w+')
-        file.write(file_header[package_data['license']].format(**package_data))
+        file.write(license_headers[package_data['license']].format(**package_data))
         file.write(test_file.format(**package_data))
         file.close()
 
     filename = os.path.join('tests','all.py')
     if not os.path.isfile(filename):
         file = open(filename, 'w+')
-        file.write(file_header[package_data['license']].format(**package_data))
+        file.write(license_headers[package_data['license']].format(**package_data))
         file.write('import unittest\n\n')
         file.write('from test_{packagename_file} import *\n\n'.format(**package_data))
         file.write('if __name__ == \'__main__\':\n    unittest.main()')
