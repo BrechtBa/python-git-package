@@ -25,7 +25,7 @@ setup(
     author='Brecht Baeten',
     author_email='brecht.baeten@gmail.com',
     packages=['python_git_package'],
-    install_requires=[],
+    install_requires=['sphinx','numpydoc'],
     classifiers=['Programming Language :: Python :: 2.7'],
     entry_points={'console_scripts': [
         'python-git-package=python_git_package:execute_from_command_line',
