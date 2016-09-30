@@ -103,7 +103,11 @@ def init():
         response = utils.raw_input_validated('A doc directory was found, keep this directory? (y)','y',['y','n','yes','no'],'Error: {} is not a valid response','Valid responses are:')
         if response in ['y','yes']:
             createdocs = False
-
+    else:
+        response = utils.raw_input_validated('Create sphinx doc directory? (y)','y',['y','n','yes','no'],'Error: {} is not a valid response','Valid responses are:')
+        if response in ['n','no']:
+            createdocs = False
+        
             
     # check existing files for package data
     if not createsetup:
@@ -358,8 +362,13 @@ def doc():
      
     """
     
-    output = subprocess.check_output(['sphinx-build', '-b', 'html', 'doc/source', 'doc/build/html'])[:-1]
-    print(output)
+    # check if the doc folder exists
+    if os.path.exists('doc/source'):
+        output = subprocess.check_output(['sphinx-build', '-b', 'html', 'doc/source', 'doc/build/html'])[:-1]
+        print(output)
+    else:
+        print('Error: no sphinx documentation source found.')
+        print('Check doc/source')
     
     
 def get_data_from_setup():
