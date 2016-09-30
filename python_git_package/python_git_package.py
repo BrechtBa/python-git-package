@@ -23,6 +23,7 @@ import datetime
 import re
 import subprocess
 import shutil
+import zipfile
 
 from . import utils
     
@@ -365,9 +366,25 @@ def doc():
     """
     
     # check if the doc folder exists
-    if os.path.exists('doc/source'):
-        output = subprocess.check_output(['sphinx-build', '-b', 'html', 'doc/source', 'doc/build/html'])[:-1]
+    sourcepath = 'doc\\source'
+    buildpath = 'doc\\build'
+    
+    if os.path.exists(sourcepath):
+        output = subprocess.check_output(['sphinx-build', '-b', 'html', sourcepath, os.path.join(sourcepath,'html')])[:-1]
         print(output)
+        
+        # create a zip file
+        zipf = zipfile.ZipFile( os.path.join(buildpath,'html.zip'), 'w', zipfile.ZIP_DEFLATED)
+        for root, dirs, files in os.walk(os.path.join(buildpath,'html')):
+            
+            for file in files:
+                fname = os.path.join(root, file)
+                aname = os.path.relpath( os.path.join(root, file), os.path.join(buildpath,'html') )
+                zipf.write( fname,aname )
+                #zipf.write(os.path.join(root, file))
+        
+        zipf.close()
+        
     else:
         print('Error: no sphinx documentation source found.')
         print('Check doc/source')
