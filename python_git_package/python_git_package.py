@@ -251,8 +251,6 @@ def release():
     
         pgp release
         
-        
-        
     """
 
     # search for a version file
@@ -325,7 +323,11 @@ def release():
     with open( versionfilename, 'w') as f:
         f.write( 'version = \'{}\''.format(version) )
 
-
+        
+    # build the documentation
+    if os.path.exists('doc/source'):
+        doc()
+        
     # create a commit message
     message = 'Created new version\nVersion: {}'.format(version)
 
@@ -345,7 +347,7 @@ def release():
 
     # add a git tag
     output = subprocess.check_output(['git', 'tag' ,'{}'.format(version)])[:-1]
-
+    
     # checkout the old branch
     output = subprocess.check_output(['git', 'checkout', branch])[:-1]
 
