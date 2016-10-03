@@ -370,7 +370,7 @@ def doc():
     buildpath = 'doc\\build'
     
     if os.path.exists(sourcepath):
-        output = subprocess.check_output(['sphinx-build', '-b', 'html', sourcepath, os.path.join(sourcepath,'html')])[:-1]
+        output = subprocess.check_output(['sphinx-build', '-b', 'html', sourcepath, os.path.join(buildpath,'html')])[:-1]
         print(output)
         
         # create a zip file
