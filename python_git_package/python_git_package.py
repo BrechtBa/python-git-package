@@ -389,6 +389,60 @@ def doc():
         print('Error: no sphinx documentation source found.')
         print('Check doc/source')
     
+def rstpy(filename,delete=True):
+    """
+    Converts an .rst file with ``.. code :: python`` tags to a python file,
+    executes it and deletes it.
+    
+    """
+
+    # read the file and get code blocks
+    code = []
+    with open(filename,'r') as f:
+        codelines = False
+        for line in f:
+            if codelines:
+                if line.startswith('    '):
+                    code.append(line[4:].rstrip())
+                elif line.startswith('\n'):
+                    code.append(line.rstrip())
+                else:
+                    codelines = False
+                    
+            if line.startswith('.. code :: python'):
+                codelines = True
+                
+    # create a python file in a temporary folder
+    if os.path.exists('_rstpy_tempfolder'):
+        shutil.rmtree('_rstpy_tempfolder')
+        
+    os.mkdir('_rstpy_tempfolder')
+    sys.path.insert(0, os.path.realpath('_rstpy_tempfolder'))
+    cwd = os.getcwd()
+    os.chdir('_rstpy_tempfolder')   
+    
+    
+    with open('_rstpy_tempfile.py','w') as f:
+        for line in code:
+            f.write(line+'\n')
+    
+    # execute the file
+    try:
+        execfile('_rstpy_tempfile.py')
+        
+        print('\n\nsuccess\n')
+        success = True
+    except Exception as e:
+        print('\n\nException:')
+        print(e)
+        success = False
+        
+    if delete:
+        # delete the temporary folder
+        os.chdir(cwd)
+        shutil.rmtree('_rstpy_tempfolder')
+        
+    return success
     
 def get_data_from_setup():
     package_data = {}
@@ -431,11 +485,23 @@ def execute_from_command_line():
 
     if command == 'init':
         init()
+        
     elif command == 'release':
         release()
         
     elif command == 'doc':
         doc()
+        
+    elif command == 'rstpy':
+        filename = sys.argv[2]
+        delete = True
+
+        if len(sys.argv) > 3:
+            if sys.argv[3] == 'keep':
+                delete = False
+            
+        rstpy(filename,delete=delete)
+   
     else:
         print('not a valid command')
         print('usage:')
