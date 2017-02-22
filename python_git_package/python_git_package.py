@@ -389,7 +389,7 @@ def doc():
         print('Error: no sphinx documentation source found.')
         print('Check doc/source')
     
-def rstpy(filename,delete=True):
+def rstpy(filename,delete=True,output=True):
     """
     Converts an .rst file with ``.. code :: python`` tags to a python file,
     executes it and deletes it.
@@ -428,13 +428,30 @@ def rstpy(filename,delete=True):
     
     # execute the file
     try:
-        execfile('_rstpy_tempfile.py')
+        #execfile('_rstpy_tempfile.py')
+        #os.system('python _rstpy_tempfile.py')
+        if output:
+            res = subprocess.call(['python', '_rstpy_tempfile.py'])
+        else:
+            fnull = open(os.devnull, 'w')
+            res = subprocess.call(['python', '_rstpy_tempfile.py'],stdout=fnull)
         
-        print('\n\nsuccess\n')
-        success = True
+        if res==0:
+            success = True
+            
+            if output:
+                print('\n\nsuccess\n')
+        else:
+            success = False
+            
+            if output:
+                print('\n\nfailed\n')
+        
     except Exception as e:
-        print('\n\nException:')
-        print(e)
+        if output:
+            print('\n\nException:')
+            print(e)
+            
         success = False
         
     if delete:
@@ -495,12 +512,15 @@ def execute_from_command_line():
     elif command == 'rstpy':
         filename = sys.argv[2]
         delete = True
-
-        if len(sys.argv) > 3:
-            if sys.argv[3] == 'keep':
-                delete = False
+        output = True
+        
+        if 'keep' in sys.argv:
+            delete = False
             
-        rstpy(filename,delete=delete)
+        if 'silent' in sys.argv:
+            output = False
+            
+        rstpy(filename,delete=delete,output=output)
    
     else:
         print('not a valid command')
