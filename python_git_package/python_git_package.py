@@ -389,77 +389,6 @@ def doc():
         print('Error: no sphinx documentation source found.')
         print('Check doc/source')
     
-def rstpy(filename,delete=True,output=True):
-    """
-    Converts an .rst file with ``.. code :: python`` tags to a python file,
-    executes it and deletes it.
-    
-    """
-
-    # read the file and get code blocks
-    code = []
-    with open(filename,'r') as f:
-        codelines = False
-        for line in f:
-            if codelines:
-                if line.startswith('    '):
-                    code.append(line[4:].rstrip())
-                elif line.startswith('\n'):
-                    code.append(line.rstrip())
-                else:
-                    codelines = False
-                    
-            if line.startswith('.. code :: python'):
-                codelines = True
-                
-    # create a python file in a temporary folder
-    if os.path.exists('_rstpy_tempfolder'):
-        shutil.rmtree('_rstpy_tempfolder')
-        
-    os.mkdir('_rstpy_tempfolder')
-    sys.path.insert(0, os.path.realpath('_rstpy_tempfolder'))
-    cwd = os.getcwd()
-    os.chdir('_rstpy_tempfolder')   
-    
-    
-    with open('_rstpy_tempfile.py','w') as f:
-        for line in code:
-            f.write(line+'\n')
-    
-    # execute the file
-    try:
-        #execfile('_rstpy_tempfile.py')
-        #os.system('python _rstpy_tempfile.py')
-        if output:
-            res = subprocess.call(['python', '_rstpy_tempfile.py'])
-        else:
-            fnull = open(os.devnull, 'w')
-            res = subprocess.call(['python', '_rstpy_tempfile.py'],stdout=fnull)
-        
-        if res==0:
-            success = True
-            
-            if output:
-                print('\n\nsuccess\n')
-        else:
-            success = False
-            
-            if output:
-                print('\n\nfailed\n')
-        
-    except Exception as e:
-        if output:
-            print('\n\nException:')
-            print(e)
-            
-        success = False
-        
-    if delete:
-        # delete the temporary folder
-        os.chdir(cwd)
-        shutil.rmtree('_rstpy_tempfolder')
-        
-    return success
     
 def get_data_from_setup():
     package_data = {}
@@ -508,19 +437,6 @@ def execute_from_command_line():
         
     elif command == 'doc':
         doc()
-        
-    elif command == 'rstpy':
-        filename = sys.argv[2]
-        delete = True
-        output = True
-        
-        if 'keep' in sys.argv:
-            delete = False
-            
-        if 'silent' in sys.argv:
-            output = False
-            
-        rstpy(filename,delete=delete,output=output)
    
     else:
         print('not a valid command')
