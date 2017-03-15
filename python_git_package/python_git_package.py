@@ -62,6 +62,7 @@ def init():
     package_data['author'] = 'me'
     package_data['author_email'] = ''
     package_data['license'] = 'MIT'
+    package_data['python_version'] = '2.7'
 
     # current year
     now = datetime.datetime.now()
@@ -127,7 +128,7 @@ def init():
     package_data['author'] = utils.raw_input('Author ({}): '.format(package_data['author'])) or package_data['author']
     package_data['author_email'] = utils.raw_input('Author email ({}): '.format(package_data['author_email'])) or package_data['author_email']
     package_data['license'] = utils.raw_input_validated('License ({}): '.format(package_data['license']),package_data['license'],license_texts.keys(),'Error: {} is not a valid license name','Valid licence names are:')
-
+    package_data['python_version'] = utils.raw_input('Python version ({}): '.format(package_data['python_version'])) or package_data['python_version']
 
 
 

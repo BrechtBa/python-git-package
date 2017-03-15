@@ -2,9 +2,11 @@
 from setuptools import setup, find_packages
 import os
 
+setuppath = os.path.dirname(os.path.abspath(__file__))
+
 # retrieve the version
 try:
-    versionfile = os.path.join('{packagename_file}','__version__.py')
+    versionfile = os.path.join(setuppath,'{packagename_file}','__version__.py')
     f = open( versionfile, 'r')
     content = f.readline()
     splitcontent = content.split('\'')
@@ -20,11 +22,11 @@ setup(
     version=version,
     license='{license}',
     description='{description}',
-    long_description=open(os.path.join(os.path.dirname(__file__), 'README.rst')).read(),
+    long_description=open(os.path.join(setuppath, 'README.rst')).read(),
     url='{url}',
     author='{author}',
     author_email='{author_email}',
     packages=find_packages(),
     install_requires=[],
-    classifiers=['Programming Language :: Python :: 2.7'],
+    classifiers=['Programming Language :: Python :: {python_version}'],
 )
