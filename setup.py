@@ -25,6 +25,7 @@ setup(
     author='Brecht Baeten',
     author_email='brecht.baeten@gmail.com',
     packages=['python_git_package'],
+    package_data = {'python_git_package': ['templates/*','templates/sphinx/*','templates/license/header/*','templates/license/text/*']},
     install_requires=['sphinx','numpydoc'],
     classifiers=['Programming Language :: Python :: 2.7'],
     entry_points={'console_scripts': [

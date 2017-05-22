@@ -274,6 +274,9 @@ def release():
     
     # get the previous version number from git
     output = subprocess.check_output(['git', 'tag'])[:-1]
+    if isinstance(output,bytes):
+        output=output.decode('utf-8')
+
     if not output == '':
         splitoutput = output.split('\n')
         oldversion = splitoutput[-1]
