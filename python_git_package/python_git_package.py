@@ -370,8 +370,8 @@ def doc():
     """
     
     # check if the doc folder exists
-    sourcepath = 'doc\\source'
-    buildpath = 'doc\\build'
+    sourcepath = os.path.join('doc','source')
+    buildpath = os.path.join('doc','build')
     
     if os.path.exists(sourcepath):
         output = subprocess.check_output(['sphinx-build', '-b', 'html', sourcepath, os.path.join(buildpath,'html')])[:-1]
