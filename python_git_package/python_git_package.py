@@ -301,20 +301,14 @@ def release():
 
     if filename == '':
         print('Could not find __version__.py')
+        # get the previous version number from git
+        output = subprocess.check_output(['git', 'tag'])[:-1]
+        if isinstance(output, bytes):
+            output = output.decode('utf-8')
 
-    branch = subprocess.check_output(['git', 'rev-parse', '--abbrev-ref', 'HEAD'])[:-1]
-
-    # if not branch=='master':
-    #    raise ValueError('the current branch ({}) is not master.'.format(branch))
-
-    # get the previous version number from git
-    output = subprocess.check_output(['git', 'tag'])[:-1]
-    if isinstance(output, bytes):
-        output = output.decode('utf-8')
-
-    if not output == '':
-        splitoutput = output.split('\n')
-        oldversion = splitoutput[-1]
+        if not output == '':
+            splitoutput = output.split('\n')
+            oldversion = splitoutput[-1]
 
     else:
         # try to get the old version number from __version__.py
@@ -348,6 +342,8 @@ def release():
                 version_ok = True
         except:
             print('Invalid version')
+
+    branch = subprocess.check_output(['git', 'rev-parse', '--abbrev-ref', 'HEAD'])[:-1]
 
     # changelog = ''
     # response = utils.raw_input_validated(
