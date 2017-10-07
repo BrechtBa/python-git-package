@@ -22,11 +22,9 @@ import os
 import datetime
 import re
 import subprocess
-import shutil
 import zipfile
 
 from . import utils
-    
 
 setup_file = utils.load_template('setup.py')
 readme_file = utils.load_template('README.rst')
@@ -39,21 +37,21 @@ license_texts = utils.load_templates_folder('license/text')
 
 docs_conf_file = utils.load_template('sphinx/conf.py')
 docs_index_file = utils.load_template('sphinx/index.rst')
-docs_pakagename_file = utils.load_template('sphinx/pakagename.rst')
+docs_packagename_file = utils.load_template('sphinx/packagename.rst')
 
 
 def init():
     """
     Scaffolding
-    
+
     Examples
     --------
     .. code-block:: bash
-    
+
         pgp init
-        
+
     """
-    
+
     # default package data
     package_data = {}
     package_data['packagename'] = os.path.split(os.getcwd())[-1]
@@ -68,69 +66,102 @@ def init():
     now = datetime.datetime.now()
     package_data['year'] = now.year
 
-
     # check for existing files
     createsetup = True
     if os.path.isfile('setup.py'):
-        response = utils.raw_input_validated('A setup.py file was found, keep this file? (y)','y',['y','n','yes','no'],'Error: {} is not a valid response','Valid responses are:')
-        if response in ['y','yes']:
+        response = utils.raw_input_validated(
+            'A setup.py file was found, keep this file? (y)', 'y',
+            ['y', 'n', 'yes', 'no'],
+            'Error: {} is not a valid response',
+            'Valid responses are:')
+        if response in ['y', 'yes']:
             createsetup = False
 
-    createmanifest = True        
+    createmanifest = True
     if os.path.isfile('manifest.in'):
-        response = utils.raw_input_validated('A manifest.in file was found, keep this file? (y)','y',['y','n','yes','no'],'Error: {} is not a valid response','Valid responses are:')
-        if response in ['y','yes']:
+        response = utils.raw_input_validated(
+            'A manifest.in file was found, keep this file? (y)', 'y',
+            ['y', 'n', 'yes', 'no'],
+            'Error: {} is not a valid response',
+            'Valid responses are:')
+        if response in ['y', 'yes']:
             createmanifest = False
-            
+
     createlicense = True
-    if os.path.isfile('LICENSE') or os.path.isfile('license') or os.path.isfile('LICENSE.txt') or os.path.isfile('license.txt') or os.path.isfile('LICENSE.md') or os.path.isfile('license.md'):
-        response = utils.raw_input_validated('A license file was found, keep this file? (y)','y',['y','n','yes','no'],'Error: {} is not a valid response','Valid responses are:')
-        if response in ['y','yes']:
+    if os.path.isfile('LICENSE') or os.path.isfile('license') or os.path.isfile('LICENSE.txt') or os.path.isfile(
+            'license.txt') or os.path.isfile('LICENSE.md') or os.path.isfile('license.md'):
+        response = utils.raw_input_validated(
+            'A license file was found, keep this file? (y)', 'y',
+            ['y', 'n', 'yes', 'no'],
+            'Error: {} is not a valid response',
+            'Valid responses are:')
+        if response in ['y', 'yes']:
             createlicense = False
 
     createreadme = True
-    if os.path.isfile('README') or os.path.isfile('readme') or os.path.isfile('README.rst') or os.path.isfile('readme.rst') or os.path.isfile('README.md') or os.path.isfile('readme.md'):
-        response = utils.raw_input_validated('A readme file was found, keep this file? (y)','y',['y','n','yes','no'],'Error: {} is not a valid response','Valid responses are:')
-        if response in ['y','yes']:
+    if os.path.isfile('README') or os.path.isfile('readme') or os.path.isfile('README.rst') or os.path.isfile(
+            'readme.rst') or os.path.isfile('README.md') or os.path.isfile('readme.md'):
+        response = utils.raw_input_validated(
+            'A readme file was found, keep this file? (y)', 'y',
+            ['y', 'n', 'yes', 'no'],
+            'Error: {} is not a valid response',
+            'Valid responses are:')
+        if response in ['y', 'yes']:
             createreadme = False
 
     creategitignore = True
     if os.path.isfile('.gitignore'):
-        response = utils.raw_input_validated('A .gitignore file was found, keep this file? (y)','y',['y','n','yes','no'],'Error: {} is not a valid response','Valid responses are:')
-        if response in ['y','yes']:
+        response = utils.raw_input_validated(
+            'A .gitignore file was found, keep this file? (y)', 'y',
+            ['y', 'n', 'yes', 'no'],
+            'Error: {} is not a valid response',
+            'Valid responses are:')
+        if response in ['y', 'yes']:
             creategitignore = False
 
     createdocs = True
     if os.path.isdir('doc'):
-        response = utils.raw_input_validated('A doc directory was found, keep this directory? (y)','y',['y','n','yes','no'],'Error: {} is not a valid response','Valid responses are:')
-        if response in ['y','yes']:
+        response = utils.raw_input_validated(
+            'A doc directory was found, keep this directory? (y)', 'y',
+            ['y', 'n', 'yes', 'no'],
+            'Error: {} is not a valid response',
+            'Valid responses are:')
+        if response in ['y', 'yes']:
             createdocs = False
     else:
-        response = utils.raw_input_validated('Create sphinx doc directory? (y)','y',['y','n','yes','no'],'Error: {} is not a valid response','Valid responses are:')
-        if response in ['n','no']:
+        response = utils.raw_input_validated(
+            'Create sphinx doc directory? (y)', 'y',
+            ['y', 'n', 'yes', 'no'],
+            'Error: {} is not a valid response',
+            'Valid responses are:')
+        if response in ['n', 'no']:
             createdocs = False
-        
-            
+
     # check existing files for package data
     if not createsetup:
         package_data.update(get_data_from_setup())
 
-
-
     # ask for the package data
     print('')
-    package_data['packagename'] = utils.raw_input('Package name ({}): '.format(package_data['packagename'])) or package_data['packagename']
-    package_data['packagename_file'] = package_data['packagename'].replace('-','_')
+    package_data['packagename'] = utils.raw_input('Package name ({}): '.format(package_data['packagename']))\
+        or package_data['packagename']
+    package_data['packagename_file'] = package_data['packagename'].replace('-', '_')
     package_data['packagename_caps'] = package_data['packagename_file'].title()
-    package_data['packagename_underline'] = package_data['packagename'] + '\n' + '='*len(package_data['packagename'])
-    package_data['description'] = utils.raw_input('Package description ({}): '.format(package_data['description'])) or package_data['description']
+    package_data['packagename_underline'] = package_data['packagename'] + '\n' + '=' * len(package_data['packagename'])
+    package_data['description'] = utils.raw_input('Package description ({}): '.format(package_data['description'])) \
+        or package_data['description']
     package_data['url'] = utils.raw_input('Package url ({}): '.format(package_data['url'])) or package_data['url']
     package_data['author'] = utils.raw_input('Author ({}): '.format(package_data['author'])) or package_data['author']
-    package_data['author_email'] = utils.raw_input('Author email ({}): '.format(package_data['author_email'])) or package_data['author_email']
-    package_data['license'] = utils.raw_input_validated('License ({}): '.format(package_data['license']),package_data['license'],license_texts.keys(),'Error: {} is not a valid license name','Valid licence names are:')
-    package_data['python_version'] = utils.raw_input('Python version ({}): '.format(package_data['python_version'])) or package_data['python_version']
-
-
+    package_data['author_email'] = utils.raw_input('Author email ({}): '.format(package_data['author_email'])) \
+        or package_data['author_email']
+    package_data['license'] = utils.raw_input_validated(
+        'License ({}): '.format(package_data['license']),
+        package_data['license'],
+        license_texts.keys(),
+        'Error: {} is not a valid license name',
+        'Valid licence names are:')
+    package_data['python_version'] = utils.raw_input('Python version ({}): '.format(package_data['python_version'])) \
+        or package_data['python_version']
 
     # create folders
     if not os.path.exists(package_data['packagename_file']):
@@ -140,13 +171,12 @@ def init():
     if not os.path.exists('examples'):
         os.makedirs('examples')
 
-
     # create files if they are not present
     if createsetup:
         file = open('setup.py', 'w+')
         file.write(setup_file.format(**package_data))
         file.close()
-        
+
     if createmanifest:
         file = open('manifest.in', 'w+')
         file.write('include README.md\ninclude LICENSE\ninclude examples/example.py')
@@ -170,7 +200,7 @@ def init():
     if createdocs:
         if not os.path.isdir('doc'):
             os.mkdir('doc')
-        if not os.path.isdir('doc/source'):    
+        if not os.path.isdir('doc/source'):
             os.mkdir('doc/source')
         if not os.path.isdir('doc/build'):
             os.mkdir('doc/build')
@@ -178,37 +208,37 @@ def init():
             os.mkdir('doc/source/_static')
         if not os.path.isdir('doc/source/_templates'):
             os.mkdir('doc/source/_templates')
-        
+
         file = open('doc/source/conf.py', 'w+')
         file.write(docs_conf_file.format(**package_data))
         file.close()
-        
+
         file = open('doc/source/index.rst', 'w+')
         file.write(docs_index_file.format(**package_data))
         file.close()
-        
+
         file = open('doc/source/{}.rst'.format(package_data['packagename_file']), 'w+')
-        file.write(docs_pakagename_file.format(**package_data))
+        file.write(docs_packagename_file.format(**package_data))
         file.close()
-        
+
         file = open('doc/.gitignore', 'w+')
         file.write('build')
         file.close()
-        
-    filename = os.path.join(package_data['packagename_file'],'__init__.py')
+
+    filename = os.path.join(package_data['packagename_file'], '__init__.py')
     if not os.path.isfile(filename):
         file = open(filename, 'w+')
         file.write('from .__version__ import version as __version__\n')
         file.write('from {} import *\n'.format(package_data['packagename_file']))
         file.close()
 
-    filename = os.path.join(package_data['packagename_file'],'__version__.py')
+    filename = os.path.join(package_data['packagename_file'], '__version__.py')
     if not os.path.isfile(filename):
         file = open(filename, 'w+')
         file.write('version = \'0.0.0\'')
         file.close()
 
-    filename = os.path.join(package_data['packagename_file'],'{}.py'.format(package_data['packagename_file']))
+    filename = os.path.join(package_data['packagename_file'], '{}.py'.format(package_data['packagename_file']))
     if not os.path.isfile(filename):
         file = open(filename, 'w+')
         file.write(license_headers[package_data['license']].format(**package_data))
@@ -216,20 +246,20 @@ def init():
         file.write(function_scaffold)
         file.close()
 
-    filename = os.path.join('examples','example.py')
+    filename = os.path.join('examples', 'example.py')
     if not os.path.isfile(filename):
         file = open(filename, 'w+')
         file.write(license_headers[package_data['license']].format(**package_data))
         file.close()
 
-    filename = os.path.join('tests','test_{}.py'.format(package_data['packagename_file']))
+    filename = os.path.join('tests', 'test_{}.py'.format(package_data['packagename_file']))
     if not os.path.isfile(filename):
         file = open(filename, 'w+')
         file.write(license_headers[package_data['license']].format(**package_data))
         file.write(test_file.format(**package_data))
         file.close()
 
-    filename = os.path.join('tests','all.py')
+    filename = os.path.join('tests', 'all.py')
     if not os.path.isfile(filename):
         file = open(filename, 'w+')
         file.write(license_headers[package_data['license']].format(**package_data))
@@ -237,7 +267,6 @@ def init():
         file.write('from test_{packagename_file} import *\n\n'.format(**package_data))
         file.write('if __name__ == \'__main__\':\n    unittest.main()')
         file.close()
-
 
     # initialise a git repository
     output = subprocess.check_output(['git', 'init'])[:-1]
@@ -259,7 +288,7 @@ def release():
     versionfilename = ''
     for d in os.walk('.'):
         if not 'build' in d[0]:
-            filename = os.path.join(d[0],'__version__.py')
+            filename = os.path.join(d[0], '__version__.py')
             if os.path.isfile(filename):
                 versionfilename = filename
                 break
@@ -267,15 +296,15 @@ def release():
     if filename == '':
         print('Could not find __version__.py')
 
-    branch = subprocess.check_output(['git', 'rev-parse', '--abbrev-ref', 'HEAD' ])[:-1]
-    
-    #if not branch=='master':
+    branch = subprocess.check_output(['git', 'rev-parse', '--abbrev-ref', 'HEAD'])[:-1]
+
+    # if not branch=='master':
     #    raise ValueError('the current branch ({}) is not master.'.format(branch))
-    
+
     # get the previous version number from git
     output = subprocess.check_output(['git', 'tag'])[:-1]
-    if isinstance(output,bytes):
-        output=output.decode('utf-8')
+    if isinstance(output, bytes):
+        output = output.decode('utf-8')
 
     if not output == '':
         splitoutput = output.split('\n')
@@ -284,7 +313,7 @@ def release():
     else:
         # try to get the old version number from __version__.py
         try:
-            with open( versionfilename, 'r') as f:
+            with open(versionfilename, 'r') as f:
                 content = f.readline()
                 splitcontent = content.split('\'')
                 oldversion = splitcontent[1]
@@ -296,63 +325,67 @@ def release():
 
     print('previous version: {}'.format(oldversion))
 
-
     # ask for a new version number
-    version = utils.raw_input('new version number: ') 
+    version = utils.raw_input('new version number: ')
 
     # check if the new version is higher than the old version
     splitversion = version.split('.')
-    if sum([int(v)*1000**i for i,v in enumerate(splitversion[::-1])]) <= sum([int(v)*1000**i for i,v in enumerate(splitoldversion[::-1])]):
-        print('The new version ({}) is not higher than the old version ({})'.format(version,oldversion))
+    if sum([int(v) * 1000 ** i for i, v in enumerate(splitversion[::-1])]) <= sum(
+            [int(v) * 1000 ** i for i, v in enumerate(splitoldversion[::-1])]):
+        print('The new version ({}) is not higher than the old version ({})'.format(version, oldversion))
         return
 
     # ask if you've updated the changelog
     changelog = ''
-    response = utils.raw_input_validated('Did you update the changelog? ','',['y','n','yes','no'],'Error: {} is not a valid response','Valid responses are:')
-    if response in ['n','no']:
+    response = utils.raw_input_validated(
+        'Did you update the changelog? ', '',
+        ['y', 'n', 'yes', 'no'],
+        'Error: {} is not a valid response',
+        'Valid responses are:')
+    if response in ['n', 'no']:
         print('Update the changelog before issuing a release')
         return
-        
 
     print('')
-    print('GIT branch: {}'.format(branch) )
-    print('Version: {}'.format(version) )
+    print('GIT branch: {}'.format(branch))
+    print('Version: {}'.format(version))
 
-    response = utils.raw_input_validated('Is this ok? ','',['y','n','yes','no'],'Error: {} is not a valid response','Valid responses are:')
-    if response in ['n','no']:
+    response = utils.raw_input_validated(
+        'Is this ok? ', '',
+        ['y', 'n', 'yes', 'no'],
+        'Error: {} is not a valid response',
+        'Valid responses are:')
+    if response in ['n', 'no']:
         print('Exit')
         return
 
-
     # write the new version number to version.py
-    with open( versionfilename, 'w') as f:
-        f.write( 'version = \'{}\''.format(version) )
+    with open(versionfilename, 'w') as f:
+        f.write('version = \'{}\''.format(version))
 
-        
     # build the documentation
     if os.path.exists('doc/source'):
         doc()
-        
+
     # create a commit message
     message = 'Created new version\nVersion: {}'.format(version)
 
     if not changelog == '':
         # add the changelog to the commit message
-        message = message + '\nChangelog:\\n{}'.format(changelog)
+        message += '\nChangelog:\\n{}'.format(changelog)
 
-    message = message + '\nThis is an automated commit.'
+    message += '\nThis is an automated commit.'
 
     # create the commit
     output = subprocess.check_output(['git', 'commit', '-a', '-m', message])[:-1]
-
 
     # merge the branch with master
     output = subprocess.check_output(['git', 'checkout', 'master'])[:-1]
     output = subprocess.check_output(['git', 'merge', branch])[:-1]
 
     # add a git tag
-    output = subprocess.check_output(['git', 'tag' ,'{}'.format(version)])[:-1]
-    
+    output = subprocess.check_output(['git', 'tag', '{}'.format(version)])[:-1]
+
     # checkout the old branch
     output = subprocess.check_output(['git', 'checkout', branch])[:-1]
 
@@ -360,93 +393,86 @@ def release():
 def doc():
     """
     Builds the documentation to html using Sphinx
-    
+
     Examples
     --------
     .. code-block:: bash
-    
+
         pgp doc
-     
+
     """
-    
+
     # check if the doc folder exists
     sourcepath = os.path.join('doc','source')
     buildpath = os.path.join('doc','build')
-    
+
     if os.path.exists(sourcepath):
-        output = subprocess.check_output(['sphinx-build', '-b', 'html', sourcepath, os.path.join(buildpath,'html')])[:-1]
+        output = subprocess.check_output(['sphinx-build', '-b', 'html', sourcepath, os.path.join(buildpath, 'html')])
+        output = output[:-1]
         print(output)
-        
+
         # create a zip file
-        zipf = zipfile.ZipFile( os.path.join(buildpath,'html.zip'), 'w', zipfile.ZIP_DEFLATED)
-        for root, dirs, files in os.walk(os.path.join(buildpath,'html')):
-            
+        zipf = zipfile.ZipFile(os.path.join(buildpath, 'html.zip'), 'w', zipfile.ZIP_DEFLATED)
+        for root, dirs, files in os.walk(os.path.join(buildpath, 'html')):
+
             for file in files:
                 fname = os.path.join(root, file)
-                aname = os.path.relpath( os.path.join(root, file), os.path.join(buildpath,'html') )
-                zipf.write( fname,aname )
-                #zipf.write(os.path.join(root, file))
-        
+                aname = os.path.relpath(os.path.join(root, file), os.path.join(buildpath, 'html'))
+                zipf.write(fname, aname)
+                # zipf.write(os.path.join(root, file))
+
         zipf.close()
-        
+
     else:
         print('Error: no sphinx documentation source found.')
         print('Check doc/source')
-    
-    
+
+
 def get_data_from_setup():
     package_data = {}
 
     with open('setup.py', 'r') as f:
         for line in f:
 
-            matchObj = re.match('.*name=\'(.*)\'',line)
-            if matchObj:
-                package_data['name'] = matchObj.group(1)
+            match_obj = re.match('.*name=\'(.*)\'', line)
+            if match_obj:
+                package_data['name'] = match_obj.group(1)
 
-            matchObj = re.match('.*description=\'(.*)\'',line)
-            if matchObj:
-                package_data['description'] = matchObj.group(1)
+            match_obj = re.match('.*description=\'(.*)\'', line)
+            if match_obj:
+                package_data['description'] = match_obj.group(1)
 
-            matchObj = re.match('.*author=\'(.*)\'',line)
-            if matchObj:
-                package_data['author'] = matchObj.group(1)
+            match_obj = re.match('.*author=\'(.*)\'', line)
+            if match_obj:
+                package_data['author'] = match_obj.group(1)
 
-            matchObj = re.match('.*author_email=\'(.*)\'',line)
-            if matchObj:
-                package_data['author_email'] = matchObj.group(1)
-                
-            matchObj = re.match('.*url=\'(.*)\'',line)
-            if matchObj:
-                package_data['url'] = matchObj.group(1)
-                
-            matchObj = re.match('.*license=\'(.*)\'',line)
-            if matchObj:
-                package_data['license'] = matchObj.group(1)
-                
+            match_obj = re.match('.*author_email=\'(.*)\'', line)
+            if match_obj:
+                package_data['author_email'] = match_obj.group(1)
+
+            match_obj = re.match('.*url=\'(.*)\'', line)
+            if match_obj:
+                package_data['url'] = match_obj.group(1)
+
+            match_obj = re.match('.*license=\'(.*)\'', line)
+            if match_obj:
+                package_data['license'] = match_obj.group(1)
+
     return package_data
 
 
-
 def execute_from_command_line():
-    #print(sys.argv)
-
     command = sys.argv[1]
 
     if command == 'init':
         init()
-        
+
     elif command == 'release':
         release()
-        
+
     elif command == 'doc':
         doc()
-   
+
     else:
         print('not a valid command')
         print('usage:')
-
-
-
-
-

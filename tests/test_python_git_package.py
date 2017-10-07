@@ -21,10 +21,11 @@ import unittest
 
 import python_git_package
 
-class TestPython_Git_Package(unittest.TestCase):
+
+class TestPythonGitPackage(unittest.TestCase):
 
     def test_version(self):
-        self.assertGreater( len(python_git_package.__version__), 0 )
+        self.assertGreater(len(python_git_package.__version__), 0)
 
 if __name__ == '__main__':
     unittest.main()

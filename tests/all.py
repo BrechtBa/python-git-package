@@ -19,7 +19,7 @@
 
 import unittest
 
-from test_python_git_package import *
+from .test_python_git_package import *
 
 if __name__ == '__main__':
     unittest.main()
