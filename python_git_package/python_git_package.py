@@ -349,16 +349,15 @@ def release():
         except:
             print('Invalid version')
 
-    # ask if you've updated the changelog
-    changelog = ''
-    response = utils.raw_input_validated(
-        'Did you update the changelog? ', '',
-        ['y', 'n', 'yes', 'no'],
-        'Error: {} is not a valid response',
-        'Valid responses are:')
-    if response in ['n', 'no']:
-        print('Update the changelog before issuing a release')
-        return
+    # changelog = ''
+    # response = utils.raw_input_validated(
+    #     'Did you update the changelog? ', '',
+    #     ['y', 'n', 'yes', 'no'],
+    #     'Error: {} is not a valid response',
+    #     'Valid responses are:')
+    # if response in ['n', 'no']:
+    #     print('Update the changelog before issuing a release')
+    #     return
 
     print('')
     print('GIT branch: {}'.format(branch))
@@ -383,11 +382,6 @@ def release():
 
     # create a commit message
     message = 'Created new version\nVersion: {}'.format(version)
-
-    if not changelog == '':
-        # add the changelog to the commit message
-        message += '\nChangelog:\\n{}'.format(changelog)
-
     message += '\nThis is an automated commit.'
 
     # create the commit
