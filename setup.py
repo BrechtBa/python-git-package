@@ -29,7 +29,7 @@ setup(
         'templates/sphinx/*',
         'templates/license/header/*',
         'templates/license/text/*']},
-    install_requires=['sphinx', 'numpydoc'],
+    install_requires=['sphinx', 'sphinx_rtd_theme', 'numpydoc'],
     classifiers=['Programming Language :: Python :: 2.7'],
     entry_points={'console_scripts': [
         'python-git-package=python_git_package:execute_from_command_line',

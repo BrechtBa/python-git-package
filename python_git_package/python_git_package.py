@@ -23,6 +23,8 @@ import datetime
 import re
 import subprocess
 import zipfile
+import sphinx
+import distutils.core
 
 from . import utils
 
@@ -39,6 +41,7 @@ docs_conf_file = utils.load_template('sphinx/conf.py')
 docs_index_file = utils.load_template('sphinx/index.rst')
 docs_packagename_file = utils.load_template('sphinx/packagename.rst')
 
+thisfilepath = os.path.dirname(os.path.realpath(__file__))
 
 def init():
     """
@@ -269,7 +272,10 @@ def init():
         file.close()
 
     # initialise a git repository
-    output = subprocess.check_output(['git', 'init'])[:-1]
+    subprocess.check_output(['git', 'init'])[:-1]
+    subprocess.check_output(['git', 'add', '.'])[:-1]
+    subprocess.check_output(['git', 'commit', '-m', 'initial commit'])[:-1]
+    subprocess.check_output(['git', 'checkout', '-b', 'dev'])
 
 
 def release():
@@ -326,14 +332,22 @@ def release():
     print('previous version: {}'.format(oldversion))
 
     # ask for a new version number
-    version = utils.raw_input('new version number: ')
+    version_ok = False
+    while not version_ok:
+        version = utils.raw_input('new version number: ')
+        try:
+            # check if the new version is higher than the old version
+            splitversion = version.split('.')
 
-    # check if the new version is higher than the old version
-    splitversion = version.split('.')
-    if sum([int(v) * 1000 ** i for i, v in enumerate(splitversion[::-1])]) <= sum(
-            [int(v) * 1000 ** i for i, v in enumerate(splitoldversion[::-1])]):
-        print('The new version ({}) is not higher than the old version ({})'.format(version, oldversion))
-        return
+            splitversion += [0]*(len(splitoldversion)-len(splitversion))
+            splitoldversion += [0]*(len(splitversion)-len(splitoldversion))
+            if sum([int(v) * 1000 ** i for i, v in enumerate(splitversion[::-1])]) <= sum(
+                    [int(v) * 1000 ** i for i, v in enumerate(splitoldversion[::-1])]):
+                print('The new version ({}) is not higher than the old version ({})'.format(version, oldversion))
+            else:
+                version_ok = True
+        except:
+            print('Invalid version')
 
     # ask if you've updated the changelog
     changelog = ''
@@ -389,6 +403,9 @@ def release():
     # checkout the old branch
     output = subprocess.check_output(['git', 'checkout', branch])[:-1]
 
+    # build an sdist
+    distutils.core.run_setup('setup.py', script_args=['sdist'])
+
 
 def doc():
     """
@@ -403,21 +420,20 @@ def doc():
     """
 
     # check if the doc folder exists
-    sourcepath = os.path.join('doc','source')
-    buildpath = os.path.join('doc','build')
+    sourcedir = os.path.join('doc', 'source')
+    builddir = os.path.join('doc', 'build', 'html')
 
-    if os.path.exists(sourcepath):
-        output = subprocess.check_output(['sphinx-build', '-b', 'html', sourcepath, os.path.join(buildpath, 'html')])
-        output = output[:-1]
+    if os.path.exists(sourcedir):
+        output = sphinx.main(['html', sourcedir, builddir])
         print(output)
 
         # create a zip file
-        zipf = zipfile.ZipFile(os.path.join(buildpath, 'html.zip'), 'w', zipfile.ZIP_DEFLATED)
-        for root, dirs, files in os.walk(os.path.join(buildpath, 'html')):
+        zipf = zipfile.ZipFile(os.path.join(builddir, 'html.zip'), 'w', zipfile.ZIP_DEFLATED)
+        for root, dirs, files in os.walk(os.path.join(builddir, 'html')):
 
             for file in files:
                 fname = os.path.join(root, file)
-                aname = os.path.relpath(os.path.join(root, file), os.path.join(buildpath, 'html'))
+                aname = os.path.relpath(os.path.join(root, file), os.path.join(builddir, 'html'))
                 zipf.write(fname, aname)
                 # zipf.write(os.path.join(root, file))
 

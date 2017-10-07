@@ -18,14 +18,52 @@
 ################################################################################
 
 import unittest
+import os
+import shutil
+import subprocess
 
 import python_git_package
 
 
 class TestPythonGitPackage(unittest.TestCase):
+    def setUp(self):
+        self.cwd = os.getcwd()
+
+    def make_dir(self):
+        try:
+            shutil.rmtree('test-package')
+        except:
+            pass
+        os.mkdir('test-package')
+        os.chdir('test-package')
+
+    def remove_dir(self):
+        try:
+            os.chdir(self.cwd)
+            shutil.rmtree('test-package')
+        except:
+            pass
 
     def test_version(self):
         self.assertGreater(len(python_git_package.__version__), 0)
+
+    def test_init(self):
+        self.make_dir()
+        python_git_package.init()
+        self.remove_dir()
+
+    def test_doc(self):
+        self.make_dir()
+        python_git_package.init()
+        python_git_package.doc()
+        self.remove_dir()
+
+    def test_release(self):
+        self.make_dir()
+        python_git_package.init()
+        python_git_package.release()
+        self.remove_dir()
+
 
 if __name__ == '__main__':
     unittest.main()

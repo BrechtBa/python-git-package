@@ -26,27 +26,25 @@ try:
 except:
     # python 3
     raw_input = input
-    
-    
+
+
 def load_template(filename):
-    with open(os.path.join( os.path.dirname(os.path.abspath(__file__)),'templates',filename), 'r') as file:
+    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates', filename), 'r') as file:
         return file.read()
 
 
 def load_templates_folder(path):
-
     result = {}
 
-    fullpath = os.path.join( os.path.dirname(os.path.abspath(__file__)),'templates',path)
+    fullpath = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'templates', path)
 
     for file in os.listdir(fullpath):
-        result[file] = load_template(os.path.join(fullpath,file))
+        result[file] = load_template(os.path.join(fullpath, file))
 
     return result
 
 
-def raw_input_validated(question,default,valid,errormessage,validlistmessage=''):
-
+def raw_input_validated(question, default, valid, errormessage, validlistmessage=''):
     ask = True
     while ask:
         response = raw_input(question) or default
@@ -63,5 +61,3 @@ def raw_input_validated(question,default,valid,errormessage,validlistmessage='')
             ask = False
 
     return response
-
-
